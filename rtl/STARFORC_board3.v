@@ -846,20 +846,21 @@ module bgpart
  );
    
    reg [7:0]       bc468c;
+	wire [7:0] BGPOS_EFF = FLIP ? ~BGPOS_D : BGPOS_D;
  
    wire            nBGV_RD = nCS_BGV | nMERD;
    wire            nBGV_WR = nCS_BGV | nMEWR;
    
-   always @(posedge grpclk1 )
-     if ( grpclk2 ) begin
-        if (bc468pe == 0) bc468c <= BGPOS_D + deviation;
-        else
-          if ( nCMPBLKs2 ) // cep,cet
-            begin
-               bc468c = bc468c + 1;
-               SWx[3] = bc468c[3] ^ FLIP;
-            end
-     end
+	always @(posedge grpclk1 )
+	  if ( grpclk2 ) begin
+		  if (bc468pe == 0) begin
+			  bc468c <= BGPOS_EFF + deviation;
+		  end
+		  else if ( nCMPBLKs2 ) begin
+			  bc468c <= bc468c + 8'd1;
+			  SWx[3] <= bc468c[3] ^ FLIP;
+		  end
+	  end
    
    assign l8_cn011_next_cp = (bc468c[2:0] == 3'b100 );
    

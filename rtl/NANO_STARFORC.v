@@ -57,7 +57,9 @@ module NANO_STARFORC
   
    input wire [6:0]   UDLRTSC,
    input wire [15:0]  dipsw,
-	input wire muteki
+	input wire muteki,
+	input wire flip_osd,
+	input wire pause_osd
  
    );
 
@@ -80,6 +82,9 @@ module NANO_STARFORC
    wire      clk_6048;
    wire      clk_12096;
    wire      clk_4m;
+	wire      clk_2m_raw;
+	wire      clk_4m_cpu;
+	wire      clk_2m_cpu;
    
    reg [3:0] ctr2_even;
    
@@ -92,13 +97,16 @@ module NANO_STARFORC
           ctr_odd <= 4'b0;
         else ctr_odd <= ctr_odd + 1;
      end
-   assign clk_12m =   ctr_even[1];
-   assign clk_6m =    ctr_even[2];
-   assign clk_4m_en = clk_4m;
-   assign clk_4m =    ctr2_even[2];
-   assign clk_2m_en = ctr2_even[3];
-   assign clk_12096 = clk_12m;
-   assign clk_6048 =  clk_6m;   
+	assign clk_12m =   ctr_even[1];
+	assign clk_6m =    ctr_even[2];
+	assign clk_4m =    ctr2_even[2];
+	assign clk_2m_raw = ctr2_even[3];
+	assign clk_4m_en  = clk_4m;
+	assign clk_2m_en  = clk_2m_raw;
+	assign clk_4m_cpu = clk_4m & ~pause_osd;
+	assign clk_2m_cpu = clk_2m_raw & ~pause_osd;
+	assign clk_12096 = clk_12m;
+	assign clk_6048  = clk_6m;
 
    wire [7:0] JOY = { 1'h0, UDLRTSC };
    
@@ -149,11 +157,13 @@ module NANO_STARFORC
    wire       BGV3_CNDX;
    wire       CLK6M_a;
    wire       nCMPBLKs2;
+	wire       FLIP_hw;
    wire       FLIP;
    wire       nMEWR;
    wire [8:0] SCRL;
    wire [7:0] BGPOS;
    wire       nSW;
+	assign 	  FLIP = FLIP_hw ^ flip_osd;
     
    //PCB connector 2
    
@@ -194,8 +204,8 @@ module NANO_STARFORC
    
    starforc_board1 gamemain1
      (
-      .cpuclk (clk_4m_en),
-      .sndclk (clk_2m_en),
+      .cpuclk (clk_4m_cpu),
+      .sndclk (clk_2m_cpu),
       .ctrlr  (JOY),
       .dipsw  ( dipsw ) , 
       .clk48m ( clk_48m ),
@@ -216,7 +226,7 @@ module NANO_STARFORC
       .BGV3_CNDX ( BGV3_CNDX ),
       .CLK6M_a ( CLK6M_a ),
       .nCMPBLKs2 ( nCMPBLKs2 ),
-      .FLIP ( FLIP ),
+      .FLIP ( FLIP_hw ),
       .nMEWR ( nMEWR ),
       .SCRL ( SCRL ),
       .BGPOS ( BGPOS ),
@@ -249,7 +259,8 @@ module NANO_STARFORC
                 .sndprom_din ( sndprom_d ),
                 .sndprom_aout ( sndprom_a ),
 					 
-					 .muteki ( muteki )
+					 .muteki ( muteki ),
+					 .pause_osd ( pause_osd )
                 
       
       );
