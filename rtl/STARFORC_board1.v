@@ -81,8 +81,7 @@ module starforc_board1
    //MiSTer side
    input wire	      reset,
 
-	input wire muteki,
-	input wire			pause_osd
+	input wire muteki
 	
    
    );
@@ -249,12 +248,12 @@ module starforc_board1
    //WDT
    reg [3:0]  wdtcounter;
    wire       nWDTRESET = ~wdtcounter[3] & ~reset ;
-   wire       WDC = pause_osd | ~T3C;
+   wire       WDC = ~T3C;
    wire       T3C = nHitDog & nPORT_IN23;
    
    always @(negedge nVBLANK or posedge WDC)
      begin
-        if (WDC == 1'b1) wdtcounter <= 4'b0000;
+        if (WDC==1 ) wdtcounter <= 4'b0000;
         else wdtcounter <= wdtcounter + 1'b1;
      end
    
