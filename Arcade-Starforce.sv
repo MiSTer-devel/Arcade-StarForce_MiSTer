@@ -232,8 +232,8 @@ module emu
                           "v,6;", // [optional] config version 0-99. 
                           // If CONF_STR options are changed in incompatible way, then change version number too,
                           // so all options will get default values on first start.
-								  "J1,Fire,-,-,-,Start 1P,Start 2P,Coin,Pause;",
-								  "jn,A,-,-,-,Start,R,Select,L;",
+								  "J1,Fire,Start 1P,Coin,Pause,Start 2P;",
+								  "jn,A,Start,Select,L,R;",
                           "V,v",`BUILD_DATE 
 };
 
@@ -388,8 +388,8 @@ module emu
    reg btn_coin_1  = 0;
 
 
-   wire m_start1  = btn_one_player  | joystk1[6] | joystk2[6] | btn_start_1;
-   wire m_start2  = btn_two_players | joystk1[7] | joystk2[7] | btn_start_2;
+   wire m_start1  = btn_one_player  | joystk1[5]  | joystk2[5]  | btn_start_1;
+   wire m_start2  = btn_two_players | joystk1[8]  | joystk2[8]  | btn_start_2;
 
    wire m_up1     = btn_up      | joystk1[3] ;
    wire m_down1   = btn_down    | joystk1[2] ;
@@ -397,9 +397,9 @@ module emu
    wire m_right1  = btn_right   | joystk1[0] ;
    wire m_trig11  = btn_trig1   | joystk1[4] ;
 
-   wire m_coin1   = btn_one_player | btn_coin_1 | joystk1[10] | joystk2[10];
+   wire m_coin1   = btn_one_player | btn_coin_1 | joystk1[6] | joystk2[6];
 	
-	wire m_pause   = joystk1[11] | joystk2[11];	
+	wire m_pause   = joystk1[7] | joystk2[7];	
 	
 	reg pause_btn_prev = 0;
 	reg pause_osd_prev = 0;
