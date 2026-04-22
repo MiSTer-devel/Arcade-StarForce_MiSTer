@@ -221,6 +221,8 @@ module emu
                           "-;",
                           "HFO1,Aspect Ratio,Original,Wide;",
                           "HFO2,Orientation,Vert,Horz;",
+								  "O7,Flip Screen,Off,On;",
+									"O8,Pause,Off,On;",
                           "O35,Scandoubler Fx,None,HQ2x,CRT 25%,CRT 50%,CRT 75%;",
                           "-;",
                           "DIP;",
@@ -230,6 +232,8 @@ module emu
                           "v,0;", // [optional] config version 0-99. 
                           // If CONF_STR options are changed in incompatible way, then change version number too,
                           // so all options will get default values on first start.
+								  "J1,Fire,Start 1P,Coin,Pause,Start 2P;",
+								  "jn,A,Start,Select,L,R;",
                           "V,v",`BUILD_DATE 
 };
 
@@ -384,8 +388,8 @@ module emu
    reg btn_coin_1  = 0;
 
 
-   wire m_start1  = btn_one_player  | joystk1[6] | joystk2[6] | btn_start_1;
-   wire m_start2  = btn_two_players | joystk1[7] | joystk2[7] | btn_start_2;
+    wire m_start1  = btn_one_player  | joystk1[5]  | joystk2[5]  | btn_start_1;
+   wire m_start2  = btn_two_players | joystk1[8]  | joystk2[8]  | btn_start_2;
 
    wire m_up1     = btn_up      | joystk1[3] ;
    wire m_down1   = btn_down    | joystk1[2] ;
@@ -393,7 +397,30 @@ module emu
    wire m_right1  = btn_right   | joystk1[0] ;
    wire m_trig11  = btn_trig1   | joystk1[4] ;
 
-   wire m_coin1   = btn_one_player | btn_coin_1 | joystk1[8];
+   wire m_coin1   = btn_one_player | btn_coin_1 | joystk1[6] | joystk2[6];
+	
+	wire m_pause   = joystk1[7] | joystk2[7];	
+	
+	reg pause_btn_prev = 0;
+	reg pause_osd_prev = 0;
+	reg pause_latch    = 0;
+
+	always @(posedge clk_sys) begin
+		if (iRST) begin
+			pause_btn_prev <= 1'b0;
+			pause_osd_prev <= status[8];
+			pause_latch    <= status[8];
+		end
+		else begin
+			pause_btn_prev <= m_pause;
+			pause_osd_prev <= status[8];
+
+			if (status[8] != pause_osd_prev)
+				pause_latch <= status[8];
+			else if (m_pause && !pause_btn_prev)
+				pause_latch <= ~pause_latch;
+		end
+	end
 
    wire [6:0] UDLRTSC = { m_up1, m_down1, m_left1, m_right1, m_trig11, m_start1, m_coin1 };
    
