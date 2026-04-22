@@ -229,7 +229,7 @@ module emu
                           "-;",
                           "O6,Invincibility,OFF,ON;",
                           "R[0],Reset and close OSD;",
-                          "v,6;", // [optional] config version 0-99. 
+                          "v,0;", // [optional] config version 0-99. 
                           // If CONF_STR options are changed in incompatible way, then change version number too,
                           // so all options will get default values on first start.
 								  "J1,Fire,Start 1P,Coin,Pause,Start 2P;",
@@ -462,8 +462,6 @@ module emu
       .UDLRTSC ( UDLRTSC ),
       .dipsw ( { sw[0],sw[1]} ),
       .muteki ( status[6] ),
-		.flip_osd ( status[7] ),
-		.pause_osd ( pause_latch )
       
       );
    
